@@ -15,7 +15,7 @@ export async function encrypt(payload: any) {
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("900 sec from now")
+    .setExpirationTime("1 hour")
     .sign(key);
 }
 
@@ -40,7 +40,7 @@ export async function login(formData: FormData) {
 
   const match = await bcrypt.compare(data.password, existingUser[0].password);
   if (!match) return { error: "Invalid credentials!" };
-  const expires: Date = new Date(Date.now() + 15 * 60 * 1000);
+  const expires: Date = new Date(Date.now() + 60 * 60 * 1000);
   const session = await encrypt({ username: data.username, expires });
   (await cookies()).set("session", session, {
     expires,
@@ -81,7 +81,7 @@ export async function signup(formData: FormData) {
   const hashedPassword: string = await bcrypt.hash(data.password, 10);
   data = { ...data, password: hashedPassword };
   await db.insert(usersTable).values(data);
-  const expires: Date = new Date(Date.now() + 15 * 60 * 1000);
+  const expires: Date = new Date(Date.now() + 60 * 60 * 1000);
   const session = await encrypt({ username: data.username, expires });
   (await cookies()).set("session", session, {
     expires,
@@ -104,7 +104,6 @@ export async function logout() {
 
 export async function updateSession(request: NextRequest) {
   const session = request.cookies.get("session")?.value;
-  console.log(session);
   const url = request.url;
   if (url.includes("login") || url.includes("signup")) {
     if (session) {
@@ -123,7 +122,7 @@ export async function updateSession(request: NextRequest) {
         (await cookies()).set("session", "", { expires: new Date(0) });
         return NextResponse.redirect(new URL("/login", request.url));
       }
-      parsed.expires = new Date(Date.now() + 15 * 60 * 1000);
+      parsed.expires = new Date(Date.now() + 60 * 60 * 1000);
       const res = NextResponse.next();
       res.cookies.set({
         name: "session",

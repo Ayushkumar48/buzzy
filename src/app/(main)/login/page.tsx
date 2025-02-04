@@ -4,28 +4,28 @@ import Input from "@/components/input/Input";
 import { Button } from "@mui/joy";
 import { login } from "@/db";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setDisabled(true);
-    setError(null);
 
     const formData = new FormData(event.currentTarget);
     const result = await login(formData);
 
     if (result?.error) {
-      setError(result.error);
+      toast.error(result.error);
       setLoading(false);
       setDisabled(false);
     } else {
-      router.replace("/");
+      router.replace("/dashboard");
+      toast.success("Logged in successfully.");
     }
   };
 
@@ -38,7 +38,6 @@ export default function Page() {
         <h1 className="text-4xl font-bold text-slate-800">
           Login to your account
         </h1>
-        {error && <p className="text-red-600 font-semibold">{error}</p>}
         <Input
           placeholder="username..."
           label="Username"
@@ -64,7 +63,7 @@ export default function Page() {
             Login
           </Button>
         </div>
-        <div className="text-cyan-600 font-semibold">
+        <div className="text-cyan-600 font-bold text-xl">
           Doesn&apos;t have an account yet,{" "}
           <a href="/signup" className="underline hover:text-cyan-700">
             create one
