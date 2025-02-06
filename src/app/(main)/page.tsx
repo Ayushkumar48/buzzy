@@ -28,7 +28,7 @@ export default function Home() {
               href="/login"
               className="px-5 py-1.5 bg-purple-500 active:bg-purple-600 duration-150 rounded-md shadow-lg cursor-pointer hover:ring-1 hover:ring-purple-400 text-white text-xl font-semibold hover:scale-[1.03]"
             >
-              Signup for free
+              Get Started
             </Link>
           </div>
         </div>
