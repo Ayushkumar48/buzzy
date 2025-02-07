@@ -85,7 +85,6 @@ export default function Where({
                     closeOnClick
                     key={i}
                     className="pl-8 flex w-full flex-row gap-2 items-center pr-2 py-1.5 rounded-lg hover:bg-[#F2EFED] cursor-pointer outline-none overflow-x-clip"
-                    title={item.name}
                     onClick={() =>
                       setTask((prev) => ({
                         ...prev,
