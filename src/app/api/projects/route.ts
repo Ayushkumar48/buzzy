@@ -18,7 +18,7 @@ export async function GET() {
     const projects = await db
       .select()
       .from(projectsTable)
-      .where(eq(username, username));
+      .where(eq(projectsTable.username, username));
     return NextResponse.json(projects);
   } catch (error) {
     console.error("Error getting projects:", error);

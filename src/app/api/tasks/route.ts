@@ -18,7 +18,7 @@ export async function GET() {
     const data = await db
       .select()
       .from(tasksTable)
-      .where(eq(username, username));
+      .where(eq(tasksTable.username, username));
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json({ error, success: false }, { status: 500 });

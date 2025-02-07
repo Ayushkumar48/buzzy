@@ -4,8 +4,10 @@ import { decrypt } from "@/db";
 import { db } from "@/db/index";
 import { projectsTable, tasksTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function GET(request: NextRequest, { params }: any) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ projectId: number }> }
+) {
   const session = (await cookies()).get("session")?.value;
   if (!session) {
     return NextResponse.json(
