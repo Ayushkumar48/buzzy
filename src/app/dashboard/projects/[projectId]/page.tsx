@@ -46,12 +46,7 @@ export default function Page() {
         }}
       />
     );
-  if (error)
-    return (
-      <div className="mt-20 text-red font-bold text-xl">
-        Error while getting data!!!{" "}
-      </div>
-    );
+
   const filteredTasks =
     tasks?.filter((item) => item.projectId === parsedProjectId) || [];
 
@@ -65,54 +60,61 @@ export default function Page() {
       >
         {data?.project.name}
       </motion.h2>
-
-      <Reorder.Group
-        axis="y"
-        values={tasks}
-        onReorder={reorderTasks}
-        className="w-full flex flex-col gap-4"
-      >
-        {filteredTasks?.map((item) => (
-          <Reorder.Item
-            key={item.id}
-            value={item}
-            layout="position"
-            transition={{ type: "spring", stiffness: 250, damping: 25 }}
-            className="cursor-grab active:cursor-grabbing"
+      {error ? (
+        <div className="mt-20 text-red font-bold text-xl">
+          Error while getting data!!!{" "}
+        </div>
+      ) : (
+        <>
+          <Reorder.Group
+            axis="y"
+            values={tasks}
+            onReorder={reorderTasks}
+            className="w-full flex flex-col gap-4"
           >
-            <Card data={item} />
-          </Reorder.Item>
-        ))}
-      </Reorder.Group>
-      <div className="w-full flex flex-row justify-start">
-        <Add
-          data={undefined}
-          saveTo={
-            isLoading
-              ? "Loading..."
-              : error
-              ? "Error fetching tasks"
-              : filteredTasks.length > 0
-              ? filteredTasks[0].saveTo
-              : "Inbox"
-          }
-        >
-          <div
-            className="flex justify-start items-center flex-row gap-2 group w-full cursor-pointer"
-            onMouseEnter={() => setIcon(true)}
-            onMouseLeave={() => setIcon(false)}
-          >
-            {icon ? (
-              <AddCircleRounded className="text-emerald-500" />
-            ) : (
-              <AddRounded className="text-emerald-500" />
-            )}
-            <span className="group-hover:text-emerald-500 text-gray-500 duration-150 ease-in-out font-semibold">
-              Add Task
-            </span>
+            {filteredTasks?.map((item) => (
+              <Reorder.Item
+                key={item.id}
+                value={item}
+                layout="position"
+                transition={{ type: "spring", stiffness: 250, damping: 25 }}
+                className="cursor-grab active:cursor-grabbing"
+              >
+                <Card data={item} />
+              </Reorder.Item>
+            ))}
+          </Reorder.Group>
+          <div className="w-full flex flex-row justify-start">
+            <Add
+              data={undefined}
+              saveTo={
+                isLoading
+                  ? "Loading..."
+                  : error
+                  ? "Error fetching tasks"
+                  : filteredTasks.length > 0
+                  ? filteredTasks[0].saveTo
+                  : "Inbox"
+              }
+            >
+              <div
+                className="flex justify-start items-center flex-row gap-2 group w-full cursor-pointer"
+                onMouseEnter={() => setIcon(true)}
+                onMouseLeave={() => setIcon(false)}
+              >
+                {icon ? (
+                  <AddCircleRounded className="text-emerald-500" />
+                ) : (
+                  <AddRounded className="text-emerald-500" />
+                )}
+                <span className="group-hover:text-emerald-500 text-gray-500 duration-150 ease-in-out font-semibold">
+                  Add Task
+                </span>
+              </div>
+            </Add>
           </div>
-        </Add>
-      </div>
+        </>
+      )}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { db } from "@/db/index";
 import { projectsTable, tasksTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function GET(request: NextRequest, params: any) {
+export async function GET(request: NextRequest, { params }: any) {
   const session = (await cookies()).get("session")?.value;
   if (!session) {
     return NextResponse.json(
@@ -14,7 +14,8 @@ export async function GET(request: NextRequest, params: any) {
     );
   }
 
-  const projectId = Number(params.projectId);
+  const { projectId } = await params;
+  console.log(projectId);
   if (isNaN(projectId)) {
     return NextResponse.json(
       { error: "Invalid project ID", success: false },
