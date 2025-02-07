@@ -1,7 +1,6 @@
 "use client";
 import { AccountCircle } from "@mui/icons-material";
 import { Divider } from "@mui/material";
-import Link from "next/link";
 import { logout } from "@/db";
 import { toast } from "react-toastify";
 import { useTransition } from "react";

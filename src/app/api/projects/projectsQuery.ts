@@ -29,10 +29,8 @@ export const addProjectsAPI = async (project: project): Promise<Project> => {
 };
 
 export const updateProjectAPI = async (project: Project): Promise<Project> => {
-  console.log(project);
   const response = await axios.put("/api/projects", project);
   if (response.status === 200) {
-    console.log(response.data);
     return response.data;
   }
   throw new Error("Error updating task.");

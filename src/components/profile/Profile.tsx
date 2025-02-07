@@ -31,7 +31,6 @@ export default function ExampleDialog({
         password: "",
         username: user.username,
       });
-      console.log(user);
     };
     fetchUserData();
   }, []);
