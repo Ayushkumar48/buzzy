@@ -10,39 +10,25 @@ import { useShallow } from "zustand/react/shallow";
 import { Bounce, toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import { addTaskAPI, updateTaskAPI } from "@/app/api/tasks/tasksQuery";
-
-type taskType = {
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  priority: 1 | 2 | 3 | 4;
-  saveTo: string;
-};
-type task = {
-  id: number;
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  priority: 1 | 2 | 3 | 4;
-  saveTo: string;
-};
+import { task } from "@/components/store/types";
 
 export default function Add({
   children,
   data,
+  saveTo,
 }: {
   children: React.ReactNode;
   data: task | undefined;
+  saveTo: string;
 }) {
-  const [task, setTask] = useState<taskType | task>({
+  const [task, setTask] = useState<task>({
     name: "",
     description: "",
     time: "12:00",
     date: new Date(),
     priority: 4,
-    saveTo: "Inbox",
+    saveTo,
+    projectId: null,
   });
 
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -51,10 +37,9 @@ export default function Add({
       setTask((prev) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { id, ...taskData } = data;
-        if (JSON.stringify(prev) !== JSON.stringify(taskData)) {
-          return taskData;
-        }
-        return prev;
+        return JSON.stringify(prev) !== JSON.stringify(taskData)
+          ? taskData
+          : prev;
       });
     }
   }, [data]);
@@ -69,7 +54,7 @@ export default function Add({
     mutationFn: addTaskAPI,
     onSuccess: (newTask) => {
       addTask(newTask);
-      toast.success(`Task added to ${task.saveTo}`, {
+      toast.success(`Task added to ${newTask.saveTo}`, {
         transition: Bounce,
         theme: "light",
       });
@@ -86,7 +71,7 @@ export default function Add({
     mutationFn: updateTaskAPI,
     onSuccess: (newTask) => {
       updateTask(newTask);
-      toast.success(`Task updated at ${task.saveTo}`, {
+      toast.success(`Task updated at ${newTask.saveTo}`, {
         transition: Bounce,
         theme: "light",
       });
@@ -103,9 +88,9 @@ export default function Add({
   async function handleAdd(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (data !== undefined) {
-      updateMutate.mutate({ ...task, id: data.id } as task);
+      updateMutate.mutate({ ...task, id: data.id });
     } else {
-      addMutate.mutate(task as taskType);
+      addMutate.mutate(task);
     }
     setTask({
       name: "",
@@ -114,6 +99,7 @@ export default function Add({
       date: new Date(),
       priority: 4,
       saveTo: "Inbox",
+      projectId: null,
     });
     setDialogOpen(false);
   }

@@ -40,7 +40,7 @@ export async function login(formData: FormData) {
 
   const match = await bcrypt.compare(data.password, existingUser[0].password);
   if (!match) return { error: "Invalid credentials!" };
-  const expires: Date = new Date(Date.now() + 60 * 60 * 1000);
+  const expires: Date = new Date(Date.now() + 7 * 60 * 60 * 1000);
   const session = await encrypt({ username: data.username, expires });
   (await cookies()).set("session", session, {
     expires,
@@ -81,7 +81,7 @@ export async function signup(formData: FormData) {
   const hashedPassword: string = await bcrypt.hash(data.password, 10);
   data = { ...data, password: hashedPassword };
   await db.insert(usersTable).values(data);
-  const expires: Date = new Date(Date.now() + 60 * 60 * 1000);
+  const expires: Date = new Date(Date.now() + 7 * 60 * 60 * 1000);
   const session = await encrypt({ username: data.username, expires });
   (await cookies()).set("session", session, {
     expires,
@@ -122,7 +122,7 @@ export async function updateSession(request: NextRequest) {
         (await cookies()).set("session", "", { expires: new Date(0) });
         return NextResponse.redirect(new URL("/login", request.url));
       }
-      parsed.expires = new Date(Date.now() + 60 * 60 * 1000);
+      parsed.expires = new Date(Date.now() + 7 * 60 * 60 * 1000);
       const res = NextResponse.next();
       res.cookies.set({
         name: "session",
@@ -138,4 +138,68 @@ export async function updateSession(request: NextRequest) {
     }
   }
   return NextResponse.next();
+}
+
+export async function getUsername() {
+  const session = (await cookies()).get("session")?.value;
+  if (session) {
+    const u = (await decrypt(session)).username;
+    return u;
+  }
+  return "Username";
+}
+export async function getUserData() {
+  const session = (await cookies()).get("session")?.value;
+  if (session) {
+    const u = (await decrypt(session)).username;
+    const userData = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.username, u))
+      .execute();
+    if (userData.length === 0) {
+      return {
+        username: "",
+        firstname: "",
+        lastname: "",
+        password: "",
+      };
+    }
+    return userData[0];
+  }
+  return {
+    username: "",
+    firstname: "",
+    lastname: "",
+    password: "",
+  };
+}
+
+export async function updateProfile(data: {
+  username: string;
+  password?: string;
+  firstname: string;
+  lastname: string;
+}) {
+  try {
+    const updateData: Partial<typeof usersTable.$inferInsert> = {
+      firstname: data.firstname,
+      lastname: data.lastname,
+    };
+    if (data.password && data.password.trim() !== "") {
+      updateData.password = await bcrypt.hash(data.password, 10);
+    }
+    await db
+      .update(usersTable)
+      .set(updateData)
+      .where(eq(usersTable.username, data.username));
+
+    return { success: true, message: "Profile updated successfully." };
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    return {
+      success: false,
+      message: "An error occurred while updating profile.",
+    };
+  }
 }

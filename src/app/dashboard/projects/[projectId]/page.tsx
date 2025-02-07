@@ -1,5 +1,5 @@
 "use client";
-import { getTasksAPI } from "@/app/api/tasks/tasksQuery";
+import { getTasksWithPIdAPI } from "@/app/api/projects/[projectId]/projectIdQuery";
 import Card from "@/components/dashboard/Inbox/Card";
 import Add from "@/components/dashboard/Modals/Add";
 import { useTasksStore } from "@/components/store/tasks";
@@ -9,8 +9,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Reorder, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
+import { useParams } from "next/navigation";
 
 export default function Page() {
+  const { projectId } = useParams();
+  const parsedProjectId = projectId ? Number(projectId) : null;
+
   const { tasks, reorderTasks, setTasks } = useTasksStore(
     useShallow((state) => ({
       tasks: state.tasks,
@@ -18,15 +22,16 @@ export default function Page() {
       setTasks: state.setTasks,
     }))
   );
-  const { isLoading, error, data } = useQuery({
-    queryKey: ["tasks"],
-    queryFn: getTasksAPI,
 
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["tasksWithPId", parsedProjectId],
+    queryFn: ({ queryKey }) => getTasksWithPIdAPI(queryKey[1] as number),
+    enabled: parsedProjectId !== null && !isNaN(parsedProjectId),
     staleTime: 1000 * 60 * 10,
   });
   useEffect(() => {
     if (data) {
-      setTasks(data);
+      setTasks(data.tasks);
     }
   }, [setTasks, data]);
 
@@ -47,15 +52,8 @@ export default function Page() {
         Error while getting data!!!{" "}
       </div>
     );
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0);
-  const sevenDaysBefore = new Date(currentDate);
-  sevenDaysBefore.setDate(currentDate.getDate() - 7);
-  const filteredTasks = tasks.filter((task) => {
-    const taskDate = new Date(task.date);
-    taskDate.setHours(0, 0, 0, 0);
-    return taskDate >= sevenDaysBefore && taskDate <= currentDate;
-  });
+  const filteredTasks =
+    tasks?.filter((item) => item.projectId === parsedProjectId) || [];
 
   return (
     <div className="flex py-16 flex-col gap-6 px-48 justify-center items-center">
@@ -65,7 +63,7 @@ export default function Page() {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="text-3xl font-extrabold text-left w-full"
       >
-        Today
+        {data?.project.name}
       </motion.h2>
 
       <Reorder.Group

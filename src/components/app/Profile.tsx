@@ -6,6 +6,7 @@ import { logout } from "@/db";
 import { toast } from "react-toastify";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import MyProfile from "@/components/profile/Profile";
 
 export default function Profile() {
   const router = useRouter();
@@ -17,24 +18,6 @@ export default function Profile() {
     });
     router.replace("/");
   }
-  const data1 = [
-    {
-      href: "#",
-      menuItem: "Discussions",
-    },
-    {
-      href: "#",
-      menuItem: "Lists",
-    },
-    {
-      href: "#",
-      menuItem: "Ratings",
-    },
-    {
-      href: "#",
-      menuItem: "Watchlist",
-    },
-  ];
   const data2 = [
     {
       href: "#",
@@ -54,32 +37,20 @@ export default function Profile() {
       <div className="invisible absolute left-0 right-0 h-12 group-hover:visible w-48" />
 
       <div className="invisible absolute top-10 z-50 left-1/2 -translate-x-1/2 flex gap-[2px] rounded-lg px-2 py-1 flex-col w-48 bg-gray-100 text-gray-800 shadow-xl group-hover:visible">
-        <Link
-          className="block border-b border-gray-100 py-1 text-lg text-gray-500 hover:text-black md:mx-2"
-          href="/profile"
-        >
+        <div className="block border-b border-gray-100 py-1 text-lg text-gray-500 hover:text-black md:mx-2">
           <div className="text-black font-bold">Ayushkumar48</div>
-          <div className="text-[15px] text-gray-400">View Profile</div>
-        </Link>
-        <Divider />
-        {data1.map((item, i) => (
-          <Link
-            key={i}
-            className="block border-b border-gray-100 py-1 font-[550] text-[17px] text-gray-500 hover:text-black md:mx-2"
-            href={item.href}
-          >
-            {item.menuItem}
-          </Link>
-        ))}
+          <MyProfile>
+            <div className="text-[15px] text-gray-400">View Profile</div>
+          </MyProfile>
+        </div>
+
         <Divider />
         {data2.map((item, i) => (
-          <Link
-            key={i}
-            className="block border-b border-gray-100 py-1 font-[550] text-[16px] text-gray-500 hover:text-black md:mx-2"
-            href={item.href}
-          >
-            {item.menuItem}
-          </Link>
+          <MyProfile key={i}>
+            <div className="border-b border-gray-100 py-1 font-[550] text-[16px] text-gray-500 hover:text-black md:mx-2 flex">
+              {item.menuItem}
+            </div>
+          </MyProfile>
         ))}
         <Divider />
         <div>

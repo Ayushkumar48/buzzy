@@ -1,5 +1,6 @@
 "use client";
 import { useProjectsStore } from "@/components/store/projects";
+import { task } from "@/components/store/types";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   AccountCircleTwoTone,
@@ -9,23 +10,14 @@ import {
 } from "@mui/icons-material";
 import { Dispatch, SetStateAction } from "react";
 
-type taskType = {
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  priority: 1 | 2 | 3 | 4;
-  saveTo: string;
-};
-
 export default function Where({
   task,
   setTask,
 }: {
-  task: taskType;
-  setTask: Dispatch<SetStateAction<taskType>>;
+  task: task;
+  setTask: Dispatch<SetStateAction<task>>;
 }) {
-  const { projects } = useProjectsStore();
+  const projects = useProjectsStore((state) => state.projects);
 
   return (
     <Menu.Root>
@@ -70,6 +62,7 @@ export default function Where({
                   setTask((prev) => ({
                     ...prev,
                     saveTo: "Inbox",
+                    projectId: null,
                   }))
                 }
                 title="Inbox"
@@ -92,16 +85,17 @@ export default function Where({
                     closeOnClick
                     key={i}
                     className="pl-8 flex w-full flex-row gap-2 items-center pr-2 py-1.5 rounded-lg hover:bg-[#F2EFED] cursor-pointer outline-none overflow-x-clip"
-                    title={item}
+                    title={item.name}
                     onClick={() =>
                       setTask((prev) => ({
                         ...prev,
-                        saveTo: item,
+                        saveTo: item.name,
+                        projectId: item.id,
                       }))
                     }
                   >
                     <TagRounded className="opacity-65" />
-                    <div className="w-[20ch] truncate">{item}</div>
+                    <div className="w-[20ch] truncate">{item.name}</div>
                   </Menu.CheckboxItem>
                 ))}
               </div>

@@ -1,35 +1,23 @@
 import { create } from "zustand";
-
-type projectType = {
-  id: number;
-  name: string;
-  colorName: string;
-  color: string;
-};
+import { project } from "./types";
 
 type projectsStore = {
-  projectNo: number;
-  projects: projectType[];
-  addProject: (p: { name: string; colorName: string; color: string }) => void;
-  updateProject: (p: projectType) => void;
-  deleteProject: (p: projectType) => void;
-  setProjects: (ps: projectType[]) => void;
+  projects: project[];
+  addProject: (p: project) => void;
+  updateProject: (p: project) => void;
+  deleteProject: (id: number) => void;
+  setProjects: (ps: project[]) => void;
 };
 
 export const useProjectsStore = create<projectsStore>((set) => ({
-  projectNo: 3,
   projects: [],
-  addProject: (p: { name: string; colorName: string; color: string }) => {
+  addProject: (p: project) => {
     set((state) => {
-      const updatedProjects = [
-        ...state.projects,
-        { ...p, id: state.projectNo },
-      ];
-      state.projectNo = state.projectNo + 1;
+      const updatedProjects = [...state.projects, p];
       return { projects: updatedProjects };
     });
   },
-  updateProject: (p: projectType) => {
+  updateProject: (p: project) => {
     set((state) => {
       const updatedProjects = state.projects.map((item) =>
         item.id === p.id ? p : item
@@ -37,11 +25,11 @@ export const useProjectsStore = create<projectsStore>((set) => ({
       return { projects: updatedProjects };
     });
   },
-  deleteProject: (p: projectType) => {
+  deleteProject: (id: number) => {
     set((state) => {
-      const updatedProjects = state.projects.filter((item) => item.id !== p.id);
+      const updatedProjects = state.projects.filter((item) => item.id !== id);
       return { projects: updatedProjects };
     });
   },
-  setProjects: (ps: projectType[]) => set({ projects: ps }),
+  setProjects: (ps: project[]) => set({ projects: ps }),
 }));

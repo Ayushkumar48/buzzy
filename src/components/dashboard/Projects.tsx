@@ -15,8 +15,12 @@ import { useProjectsStore } from "../store/projects";
 import { Popover } from "@base-ui-components/react/popover";
 import { Divider } from "@mui/material";
 import { useShallow } from "zustand/react/shallow";
-import { useQuery } from "@tanstack/react-query";
-import { getProjectsAPI } from "@/app/api/projects/projectsQuery";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  deleteProjectAPI,
+  getProjectsAPI,
+} from "@/app/api/projects/projectsQuery";
+import { Bounce, toast } from "react-toastify";
 
 export default function Projects() {
   const [toggleProjects, setToggleProjects] = useState(true);
@@ -32,6 +36,23 @@ export default function Projects() {
     queryKey: ["projects"],
     queryFn: getProjectsAPI,
     staleTime: 1000 * 60 * 10,
+  });
+  const deleteMutate = useMutation({
+    mutationFn: deleteProjectAPI,
+    onSuccess: (id) => {
+      deleteProject(id);
+      toast.info("1 Project deleted", {
+        transition: Bounce,
+        theme: "light",
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Error occured while deleting project!", {
+        transition: Bounce,
+        theme: "light",
+      });
+    },
   });
   useEffect(() => {
     if (data) {
@@ -66,7 +87,7 @@ export default function Projects() {
         </div>
       </div>
       <div
-        className={`transition-all duration-500 ease-in-out overflow-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:rounded-lg [&::-webkit-scrollbar-thumb]:rounded-lg h-80
+        className={`transition-all duration-500 ease-in-out overflow-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:rounded-lg [&::-webkit-scrollbar-thumb]:rounded-lg h-80
     ${
       toggleProjects
         ? "opacity-100 translate-y-0"
@@ -78,25 +99,23 @@ export default function Projects() {
           <div
             key={item.id}
             className={`flex flex-row group justify-between px-2 py-1.5 items-center rounded-lg ${
-              pathname === item.name.split(" ").join("2%c").toLowerCase()
+              Number(pathname) === item.id
                 ? "bg-[#CCFBF1]"
                 : "hover:bg-[#F2EFED]"
             }`}
           >
             <Link
-              href={`/dashboard/projects/${item.name
-                .split(" ")
-                .join("2%c")
-                .toLowerCase()}`}
-              className="flex flex-row gap-4"
+              href={`/dashboard/projects/${item.id}`}
+              className="flex flex-row gap-4 items-center w-full overflow-hidden"
             >
               <TagRounded style={{ color: item.color }} />
-              <div>{item.name}</div>
+              <div className="truncate w-[20ch]">{item.name}</div>
             </Link>
             <Popover.Root>
-              <Popover.Trigger className="outline-none">
+              <Popover.Trigger className="outline-none flex-shrink-0">
                 <MoreHorizRounded className="text-gray-500 hover:bg-slate-200 rounded invisible group-hover:visible p-0.5 cursor-pointer" />
               </Popover.Trigger>
+
               <Popover.Portal>
                 <Popover.Positioner
                   sideOffset={5}
@@ -113,7 +132,7 @@ export default function Projects() {
                     <Divider />
                     <Popover.Description
                       className="px-3 py-2 outline-none flex gap-x-2 items-center hover:bg-slate-100 cursor-pointer"
-                      onClick={() => deleteProject(item)}
+                      onClick={() => deleteMutate.mutate(item.id)}
                     >
                       <DeleteOutlineRounded
                         className="text-red"

@@ -17,7 +17,7 @@ export default function ColorPalette({
     SetStateAction<{ name: string; colorName: string; color: string }>
   >;
   options: {
-    value: string;
+    colorName: string;
     color: string;
   }[];
 }) {
@@ -41,8 +41,8 @@ export default function ColorPalette({
           className="w-4 h-4 rounded-full mr-2"
           style={{
             backgroundColor:
-              options.find((opt) => opt.value === project.colorName)?.color ||
-              "#000",
+              options.find((opt) => opt.colorName === project.colorName)
+                ?.color || "#000",
           }}
         ></div>
         {project.colorName}
@@ -56,17 +56,21 @@ export default function ColorPalette({
             {options.map((option) => (
               <Menu.CheckboxItem
                 closeOnClick
-                key={option.value}
+                key={option.colorName}
                 className="flex items-center px-2 py-1 hover:bg-slate-100 cursor-pointer outline-none"
-                onClick={() =>
-                  setProject({ ...project, colorName: option.value })
-                }
+                onClick={() => {
+                  setProject({
+                    ...project,
+                    colorName: option.colorName,
+                    color: option.color,
+                  });
+                }}
               >
                 <div
                   className="w-4 h-4 rounded-full mr-2"
                   style={{ backgroundColor: option.color }}
                 ></div>
-                {option.value}
+                {option.colorName}
               </Menu.CheckboxItem>
             ))}
           </Menu.Popup>

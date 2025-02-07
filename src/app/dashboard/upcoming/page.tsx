@@ -1,23 +1,54 @@
 "use client";
+import { getTasksAPI } from "@/app/api/tasks/tasksQuery";
 import Card from "@/components/dashboard/Inbox/Card";
 import Add from "@/components/dashboard/Modals/Add";
 import { useTasksStore } from "@/components/store/tasks";
 import { AddCircleRounded, AddRounded } from "@mui/icons-material";
+import { LinearProgress } from "@mui/joy";
+import { useQuery } from "@tanstack/react-query";
 import { Reorder, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 export default function Page() {
-  const [icon, setIcon] = useState(false);
-  const { tasks, reorderTasks } = useTasksStore(
+  const { tasks, reorderTasks, setTasks } = useTasksStore(
     useShallow((state) => ({
       tasks: state.tasks,
       reorderTasks: state.reorderTasks,
+      setTasks: state.setTasks,
     }))
   );
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["tasks"],
+    queryFn: getTasksAPI,
 
+    staleTime: 1000 * 60 * 10,
+  });
+  useEffect(() => {
+    if (data) {
+      setTasks(data);
+    }
+  }, [setTasks, data]);
+
+  const [icon, setIcon] = useState<boolean>(false);
+  if (isLoading)
+    return (
+      <LinearProgress
+        variant="soft"
+        sx={{
+          "--LinearProgress-thickness": "5px",
+          color: "#10B981",
+        }}
+      />
+    );
+  if (error)
+    return (
+      <div className="mt-20 text-red font-bold text-xl">
+        Error while getting data!!!{" "}
+      </div>
+    );
   const currentDate = new Date();
-  const filteredUpcomingTasks = tasks.filter((task) => {
+  const filteredTasks = tasks.filter((task) => {
     const taskDate = new Date(task.date);
     const taskTime = new Date(`${taskDate.toDateString()} ${task.time}`);
     return taskTime > currentDate;
@@ -31,7 +62,7 @@ export default function Page() {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="text-3xl font-extrabold text-left w-full"
       >
-        Upcoming Tasks
+        Upcoming
       </motion.h2>
 
       <Reorder.Group
@@ -40,7 +71,7 @@ export default function Page() {
         onReorder={reorderTasks}
         className="w-full flex flex-col gap-4"
       >
-        {filteredUpcomingTasks.map((item) => (
+        {filteredTasks?.map((item) => (
           <Reorder.Item
             key={item.id}
             value={item}
@@ -52,9 +83,19 @@ export default function Page() {
           </Reorder.Item>
         ))}
       </Reorder.Group>
-
       <div className="w-full flex flex-row justify-start">
-        <Add data={undefined}>
+        <Add
+          data={undefined}
+          saveTo={
+            isLoading
+              ? "Loading..."
+              : error
+              ? "Error fetching tasks"
+              : filteredTasks.length > 0
+              ? filteredTasks[0].saveTo
+              : "Inbox"
+          }
+        >
           <div
             className="flex justify-start items-center flex-row gap-2 group w-full cursor-pointer"
             onMouseEnter={() => setIcon(true)}

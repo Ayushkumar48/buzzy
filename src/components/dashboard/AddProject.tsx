@@ -6,6 +6,12 @@ import ColorPallete from "./Modals/ColorPallete";
 import { FormEvent, useState } from "react";
 import { useProjectsStore } from "../store/projects";
 import { useShallow } from "zustand/react/shallow";
+import { useMutation } from "@tanstack/react-query";
+import {
+  addProjectsAPI,
+  updateProjectAPI,
+} from "@/app/api/projects/projectsQuery";
+import { Bounce, toast } from "react-toastify";
 
 type projectType = {
   name: string;
@@ -15,26 +21,26 @@ type projectType = {
 };
 
 const options = [
-  { value: "Berry Red", color: "#b8255f" },
-  { value: "Red", color: "#cf473a" },
-  { value: "Orange", color: "#c77100" },
-  { value: "Yellow", color: "#b29104" },
-  { value: "Olive Green", color: "#949c31" },
-  { value: "Lime Green", color: "#65a33a" },
-  { value: "Green", color: "#369307" },
-  { value: "Mint Green", color: "#42a393" },
-  { value: "Teal", color: "#148fad" },
-  { value: "Sky Blue", color: "#319dc0" },
-  { value: "Light Blue", color: "#6988a4" },
-  { value: "Blue", color: "#2a67e2" },
-  { value: "Grape", color: "#692ec2" },
-  { value: "Violet", color: "#ac30cc" },
-  { value: "Lavender", color: "#a4698c" },
-  { value: "Magenta", color: "#e05095" },
-  { value: "Salmon", color: "#b2635c" },
-  { value: "Charcoal", color: "#808080" },
-  { value: "Grey", color: "#999999" },
-  { value: "Taupe", color: "#8f7a69" },
+  { colorName: "Berry Red", color: "#b8255f" },
+  { colorName: "Red", color: "#cf473a" },
+  { colorName: "Orange", color: "#c77100" },
+  { colorName: "Yellow", color: "#b29104" },
+  { colorName: "Olive Green", color: "#949c31" },
+  { colorName: "Lime Green", color: "#65a33a" },
+  { colorName: "Green", color: "#369307" },
+  { colorName: "Mint Green", color: "#42a393" },
+  { colorName: "Teal", color: "#148fad" },
+  { colorName: "Sky Blue", color: "#319dc0" },
+  { colorName: "Light Blue", color: "#6988a4" },
+  { colorName: "Blue", color: "#2a67e2" },
+  { colorName: "Grape", color: "#692ec2" },
+  { colorName: "Violet", color: "#ac30cc" },
+  { colorName: "Lavender", color: "#a4698c" },
+  { colorName: "Magenta", color: "#e05095" },
+  { colorName: "Salmon", color: "#b2635c" },
+  { colorName: "Charcoal", color: "#808080" },
+  { colorName: "Grey", color: "#999999" },
+  { colorName: "Taupe", color: "#8f7a69" },
 ];
 
 export default function AddProject({
@@ -69,18 +75,54 @@ export default function AddProject({
       updateProject: state.updateProject,
     }))
   );
+  const addMutate = useMutation({
+    mutationFn: addProjectsAPI,
+    onSuccess: (newProject) => {
+      addProject(newProject);
+      toast.success(`New project created ${newProject.name}`, {
+        transition: Bounce,
+        theme: "light",
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Error occured while while creating project!", {
+        transition: Bounce,
+        theme: "light",
+      });
+    },
+  });
+  const updateMutate = useMutation({
+    mutationFn: updateProjectAPI,
+    onSuccess: (updatedProject) => {
+      updateProject(updatedProject);
+      toast.success(`1 project updated to ${updatedProject.name}`, {
+        transition: Bounce,
+        theme: "light",
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Error occured while while updating project!", {
+        transition: Bounce,
+        theme: "light",
+      });
+    },
+  });
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (data) {
-      updateProject({
-        id: data.id,
-        ...project,
-      });
+    if (data !== undefined) {
+      updateMutate.mutate({ ...project, id: data.id });
     } else {
-      addProject(project);
+      addMutate.mutate(project);
     }
     setDialogOpen(false);
+    setProject({
+      name: "",
+      colorName: "Berry Red",
+      color: "#b8255f",
+    });
   }
 
   return (

@@ -62,7 +62,6 @@ export async function PUT(req: Request) {
     }
     const username = (await decrypt(session.value)).username;
     const task = await req.json();
-    console.log(task, username);
     const { id, ...t } = task;
     await db
       .update(tasksTable)

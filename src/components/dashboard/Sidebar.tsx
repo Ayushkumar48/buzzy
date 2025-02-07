@@ -44,7 +44,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        <Add data={undefined}>
+        <Add data={undefined} saveTo="Inbox">
           <div className="flex flex-row gap-4 hover:bg-[#ccfbf1] active:scale-[0.97] duration-500 ease-in-out px-2 py-1.5 items-center rounded-lg">
             <AddCircleRounded className="text-emerald-500" />
             <div className="font-bold text-emerald-800">Add Task</div>

@@ -1,15 +1,7 @@
+import { task } from "@/components/store/types";
 import axios from "axios";
 
-type Task = {
-  id: number;
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  priority: 1 | 2 | 3 | 4;
-  saveTo: string;
-};
-type task = {
+type taskType = {
   name: string;
   description: string;
   date: Date;
@@ -26,7 +18,7 @@ export const getTasksAPI = async () => {
   throw new Error("Error getting tasks.");
 };
 
-export const addTaskAPI = async (task: task): Promise<Task> => {
+export const addTaskAPI = async (task: taskType): Promise<task> => {
   const response = await axios.post("/api/tasks", task);
   if (response.status === 200) {
     return response.data[0];
@@ -34,7 +26,7 @@ export const addTaskAPI = async (task: task): Promise<Task> => {
   throw new Error("Error adding task.");
 };
 
-export const updateTaskAPI = async (task: Task): Promise<Task> => {
+export const updateTaskAPI = async (task: task): Promise<task> => {
   const response = await axios.put("/api/tasks", task);
   if (response.status === 200) {
     return response.data;

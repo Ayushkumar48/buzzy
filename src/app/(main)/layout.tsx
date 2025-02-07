@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Beiruti } from "next/font/google";
 import "../globals.css";
 import Header from "@/components/app/Header";
+import Footer from "@/components/app/Footer";
 
 const beiruti = Beiruti({
   weight: ["400", "700", "900", "500", "600", "800"],
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body className={`${beiruti.className} antialiased`}>
         <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );

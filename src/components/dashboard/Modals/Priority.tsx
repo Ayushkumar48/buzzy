@@ -3,22 +3,14 @@ import { FlagRounded, OutlinedFlagRounded } from "@mui/icons-material";
 import { Divider } from "@mui/material";
 import { Menu } from "@base-ui-components/react/menu";
 import { Dispatch, SetStateAction } from "react";
-
-type taskType = {
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  priority: 1 | 2 | 3 | 4;
-  saveTo: string;
-};
+import { task } from "@/components/store/types";
 
 export default function Priority({
   task,
   setTask,
 }: {
-  task: taskType;
-  setTask: Dispatch<SetStateAction<taskType>>;
+  task: task;
+  setTask: Dispatch<SetStateAction<task>>;
 }) {
   const priorities: string[] = ["text-red", "text-yellow", "text-blue"];
 

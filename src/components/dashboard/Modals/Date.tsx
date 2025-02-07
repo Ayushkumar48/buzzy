@@ -1,21 +1,13 @@
 "use client";
+import { task } from "@/components/store/types";
 import { Dispatch, SetStateAction } from "react";
-
-type taskType = {
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  priority: 1 | 2 | 3 | 4;
-  saveTo: string;
-};
 
 export default function MyDatePicker({
   task,
   setTask,
 }: {
-  task: taskType;
-  setTask: Dispatch<SetStateAction<taskType>>;
+  task: task;
+  setTask: Dispatch<SetStateAction<task>>;
 }) {
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const date = new Date(e.target.value);

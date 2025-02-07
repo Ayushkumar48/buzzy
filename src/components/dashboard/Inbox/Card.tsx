@@ -12,16 +12,7 @@ import { Bounce, toast } from "react-toastify";
 import Add from "../Modals/Add";
 import { deleteTaskAPI } from "@/app/api/tasks/tasksQuery";
 import { useMutation } from "@tanstack/react-query";
-
-type task = {
-  id: number;
-  name: string;
-  description: string;
-  date: Date;
-  time: string;
-  priority: 1 | 2 | 3 | 4;
-  saveTo: string;
-};
+import { task } from "@/components/store/types";
 
 export default function Card({ data }: { data: task }) {
   const removeTask = useTasksStore((state) => state.removeTask);
@@ -52,7 +43,7 @@ export default function Card({ data }: { data: task }) {
     },
   });
   async function handleRemove(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.checked === true) {
+    if (e.target.checked === true && data.id) {
       deleteMutate.mutate(data.id);
     }
   }
@@ -106,7 +97,7 @@ export default function Card({ data }: { data: task }) {
         <div className="absolute right-0 w-36 h-12 bg-gradient-to-l from-white via-white to-transparent opacity-100" />
 
         <div className="relative flex flex-row gap-2 justify-center items-center pt-1.5 pr-1">
-          <Add data={data}>
+          <Add data={data} saveTo="Inbox">
             <BorderColorRounded
               className="text-gray-500 hover:bg-slate-200 p-0.5 rounded-sm transition-colors duration-200"
               fontSize="medium"

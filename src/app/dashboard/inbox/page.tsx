@@ -79,7 +79,18 @@ export default function Page() {
         ))}
       </Reorder.Group>
       <div className="w-full flex flex-row justify-start">
-        <Add data={undefined}>
+        <Add
+          data={undefined}
+          saveTo={
+            isLoading
+              ? "Loading..."
+              : error
+              ? "Error fetching tasks"
+              : filteredTasks.length > 0
+              ? filteredTasks[0].saveTo
+              : "Inbox"
+          }
+        >
           <div
             className="flex justify-start items-center flex-row gap-2 group w-full cursor-pointer"
             onMouseEnter={() => setIcon(true)}

@@ -12,15 +12,7 @@ type tasksStore = {
 
 export const useTasksStore = create<tasksStore>((set) => ({
   tasks: [],
-  addTask: (t: {
-    id: number;
-    name: string;
-    description: string;
-    date: Date;
-    time: string;
-    priority: 1 | 2 | 3 | 4;
-    saveTo: string;
-  }) =>
+  addTask: (t: task) =>
     set((state) => ({
       tasks: [...state.tasks, t],
     })),

@@ -17,6 +17,7 @@ export const tasksTable = pgTable("tasks", {
   time: varchar({ length: 255 }).notNull(),
   priority: integer("priority").notNull(),
   saveTo: text().notNull(),
+  projectId: integer(),
 });
 
 export const projectsTable = pgTable("projects", {
